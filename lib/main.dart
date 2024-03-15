@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'accueilPage.dart'; // Assurez-vous que le chemin d'importation est correct
+import 'navBar.dart'; // Assurez-vous que le chemin d'importation est correct
 
 void main() {
   runApp(MyApp());
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: AccueilPage(), // Utilisez AccueilPage comme page d'accueil
+      home: NavBar(), // Utilisez AccueilPage comme page d'accueil
     );
   }
 }
