@@ -10,14 +10,19 @@ class AccueilPage extends StatefulWidget {
 }
 
 class _AccueilPageState extends State<AccueilPage> {
+  int _selectedIndex = 0;
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index; // Mettre à jour avec le nouvel index
+    });
+  }
   @override
-  int _selectedIndex = 0; // Initialisation à 0 pour sélectionner le premier onglet
   Widget build(BuildContext context) {
     // Votre UI sera construit ici
     return Scaffold(
       appBar: AppBar(
         title: Text('Bienvenue !'),
-        backgroundColor: Colors.blue,
+        backgroundColor: Color(0xFF15232E),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -27,6 +32,15 @@ class _AccueilPageState extends State<AccueilPage> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Color(0xFF0F1E2B), // Arrière-plan bottom bar
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        showUnselectedLabels: true,
+        selectedItemColor: Color(0xFF12273C), // Texte bottom bar - sélectionné
+        unselectedItemColor: Color(0xFF778BA8), // Texte bottom bar - non sélectionné
+        selectedLabelStyle: TextStyle(color: Color(0xFF12273C)), // Style pour le label sélectionné
+        unselectedLabelStyle: TextStyle(color: Color(0xFF778BA8)), // Style pour le label non sélectionné
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: SvgPicture.asset('assets/images/navbar_home.svg', color: _selectedIndex == 0 ? Colors.blue : Colors.grey),
@@ -37,15 +51,15 @@ class _AccueilPageState extends State<AccueilPage> {
             label: 'Comics',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/images/navbar_series.svg', color: _selectedIndex == 1 ? Colors.blue : Colors.grey),
+            icon: SvgPicture.asset('assets/images/navbar_series.svg', color: _selectedIndex == 2 ? Colors.blue : Colors.grey),
             label: 'Séries',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/images/navbar_movies.svg', color: _selectedIndex == 1 ? Colors.blue : Colors.grey),
+            icon: SvgPicture.asset('assets/images/navbar_movies.svg', color: _selectedIndex == 3 ? Colors.blue : Colors.grey),
             label: 'Films',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/images/navbar_search.svg', color: _selectedIndex == 1 ? Colors.blue : Colors.grey),
+            icon: SvgPicture.asset('assets/images/navbar_search.svg', color: _selectedIndex == 4 ? Colors.blue : Colors.grey),
             label: 'Recherche',
           ),
           // Vous pouvez ajouter plus d'items ici
