@@ -11,12 +11,13 @@ class AccueilPage extends StatefulWidget {
 
 class _AccueilPageState extends State<AccueilPage> {
   @override
+  int _selectedIndex = 0; // Initialisation à 0 pour sélectionner le premier onglet
   Widget build(BuildContext context) {
     // Votre UI sera construit ici
     return Scaffold(
       appBar: AppBar(
         title: Text('Bienvenue !'),
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.blue,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -28,12 +29,29 @@ class _AccueilPageState extends State<AccueilPage> {
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: SvgPicture.asset('assets/images/navbar_home.svg', color: _selectedIndex == 0 ? Colors.blue : Colors.grey),
             label: 'Accueil',
           ),
-          // Ajoutez d'autres items ici
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset('assets/images/navbar_comics.svg', color: _selectedIndex == 1 ? Colors.blue : Colors.grey),
+            label: 'Comics',
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset('assets/images/navbar_series.svg', color: _selectedIndex == 1 ? Colors.blue : Colors.grey),
+            label: 'Séries',
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset('assets/images/navbar_movies.svg', color: _selectedIndex == 1 ? Colors.blue : Colors.grey),
+            label: 'Films',
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset('assets/images/navbar_search.svg', color: _selectedIndex == 1 ? Colors.blue : Colors.grey),
+            label: 'Recherche',
+          ),
+          // Vous pouvez ajouter plus d'items ici
         ],
       ),
+
     );
   }
 }
