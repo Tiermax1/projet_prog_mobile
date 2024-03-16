@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'navBar.dart'; // Assurez-vous que le chemin d'importation est correct
+import 'ecran_acceuil.dart'; // Utilisez le nouveau nom de fichier après renommage
 
-void main() {
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Titre de l\'application',
+      title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          secondary: Colors.orange, // Utilisez secondary au lieu de accentColor
+        ),
       ),
-      home: NavBar(), // Utilisez AccueilPage comme page d'accueil
+      home: HomeScreen(), // Assurez-vous que HomeScreen est bien défini dans ecran_accueil.dart
     );
   }
 }
