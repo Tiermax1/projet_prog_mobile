@@ -25,7 +25,7 @@ class SeriesScreen extends StatelessWidget {
   final Color titleColor = Colors.white;
   final double topPadding = 0.0; // Ajustez cette valeur en fonction de l'image fournie
 
-  @override
+  @overrid
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
