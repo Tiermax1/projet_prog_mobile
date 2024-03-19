@@ -19,7 +19,12 @@ class _NavBarState extends State<NavBar> {
     setState(() {
       _selectedIndex = index;
     });
-    widget.onItemSelected(index);
+
+    if (index == 2) { // Si l'onglet "Séries" est sélectionné, utilisez Navigator pour afficher la SeriesScreen
+      Navigator.pushNamed(context, '/series');
+    } else {
+      widget.onItemSelected(index);
+    }
   }
 
   @override
