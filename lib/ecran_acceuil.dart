@@ -1,100 +1,274 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'navBar.dart'; // Assurez-vous que le chemin vers nav_bar.dart est correct
+import 'package:flutter_svg/svg.dart';
+import 'package:http/http.dart' as http;
+import 'navBar.dart';
+import 'config.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<dynamic> series = [];
+  List<dynamic> comics = [];
+  List<dynamic> movies = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    await fetchSeries();
+    await fetchComics();
+    await fetchMovies();
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future<void> fetchSeries() async {
+    final String apiKey = Config.comicVineApiKey;
+    final String seriesEndpoint = 'series_list'; // Ajustez selon l'API
+    final String apiUrl =
+        'https://comicvine.gamespot.com/api/$seriesEndpoint?api_key=$apiKey&format=json';
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body)['results'];
+        setState(() {
+          series = result;
+        });
+      } else {
+        throw Exception('Failed to load series');
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> fetchComics() async {
+    final String apiKey = Config.comicVineApiKey;
+    final String comicsEndpoint = 'issues'; // Ajustez selon l'API
+    final String apiUrl =
+        'https://comicvine.gamespot.com/api/$comicsEndpoint?api_key=$apiKey&format=json';
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body)['results'];
+        setState(() {
+          comics = result;
+        });
+      } else {
+        throw Exception('Failed to load comics');
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> fetchMovies() async {
+    final String apiKey = Config.comicVineApiKey;
+    final String moviesEndpoint = 'movies'; // Ajustez selon l'API
+    final String apiUrl =
+        'https://comicvine.gamespot.com/api/$moviesEndpoint?api_key=$apiKey&format=json';
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body)['results'];
+        setState(() {
+          movies = result;
+        });
+      } else {
+        throw Exception('Failed to load movies');
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Utilisez les dimensions et positions comme définies dans vos captures d'écran.
-    final double astronautSize = 121.85;
-    final double astronautRight = MediaQuery.of(context).size.width - astronautSize - 244; // La position X de l'astronaute doit être ajustée ici
-    final double astronautTop = 16; // La position Y de l'astronaute doit être ajustée ici
-
-    final double sectionWidth = 424; // La largeur de la section doit être ajustée ici
-    final double sectionHeight = 329; // La hauteur de la section doit être ajustée ici
-    final double sectionTop = 107; // La position Y de la section doit être ajustée ici
-
+    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Color(0xFF15232E), // Couleur de fond pour tout l'écran
+      backgroundColor: Color(0xFF15232E),
       appBar: AppBar(
-        backgroundColor: Color(0xFF15232E), // Couleur de fond de la AppBar
-        elevation: 0, // Pas d'ombre
-        title: Text(
-          'Bienvenue !',
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+        backgroundColor: Color(0xFF15232E),
+        elevation: 0,
+        title: Padding(
+          padding: const EdgeInsets.only(left: 20.0, top: 30),
+          child: Text(
+            'Bienvenue !',
+            style: TextStyle(
+                fontFamily: 'Nunito',
+                color: Colors.white,
+                fontSize: 30,
+                fontWeight: FontWeight.bold),
+          ),
         ),
-        actions: [
-          IconButton(
-            icon: SvgPicture.asset('assets/images/heart.svg'), // Remplacez par l'icône de coeur
-            onPressed: () {},
-          ),
-        ],
       ),
-      body: Stack(
-        children: [
-          Positioned(
-            top: astronautTop,
-            right: astronautRight,
-            child: SvgPicture.asset(
-              'assets/images/astronaut.svg', // Assurez-vous que le chemin d'accès est correct
-              width: astronautSize,
-              height: astronautSize,
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: sectionTop),
-            child: SingleChildScrollView(
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   buildSection(
-                      title: 'Séries populaires',
-                      width: sectionWidth,
-                      height: sectionHeight,
-                      context: context
+                    title: 'Séries populaires',
+                    items: series,
+                    context: context,
                   ),
-                  // Ici, insérez votre liste horizontale ou autre widget pour les séries
                   buildSection(
-                      title: 'Comics populaires',
-                      width: sectionWidth,
-                      height: sectionHeight,
-                      context: context
+                    title: 'Comics populaires',
+                    items: comics,
+                    context: context,
                   ),
-                  // Ici, insérez votre liste horizontale ou autre widget pour les comics
+                  buildSection(
+                    title: 'Films populaires',
+                    items: movies,
+                    context: context,
+                  ),
                 ],
               ),
             ),
-          ),
-        ],
-      ),
       bottomNavigationBar: NavBar(onItemSelected: (index) {
         // Mettez à jour l'interface utilisateur ou naviguez vers une nouvelle page
       }),
     );
   }
 
-  Widget buildSection({required String title, required double width, required double height, required BuildContext context}) {
+  Widget buildSection({
+    required String title,
+    required List<dynamic> items,
+    required BuildContext context,
+  }) {
     return Container(
-      width: width,
-      height: height,
+      margin: EdgeInsets.symmetric(vertical: 10.0),
+      padding: EdgeInsets.all(10.0),
       decoration: BoxDecoration(
-        color: Color(0xFF1E3243), // Couleur de fond pour les sections
-        borderRadius: BorderRadius.circular(20), // Bords arrondis pour le conteneur
+        color: Color(0xFF1E3243),
+        borderRadius: BorderRadius.circular(20),
       ),
-      margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Marge autour du conteneur
-      padding: EdgeInsets.all(16.0), // Padding à l'intérieur du conteneur
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFFFF8100),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 10.0,
+                      height: 10.0,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFFFA500),
+                        shape: BoxShape.circle,
+                      ),
+                      margin: EdgeInsets.only(right: 8.0),
+                    ),
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontFamily: 'Nunito',
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+                TextButton(
+                  onPressed: () {
+                    // Action pour "Voir plus"
+                  },
+                  child: Text(
+                    'Voir plus',
+                    style: TextStyle(
+                      fontFamily: 'Nunito',
+                      color: Colors.white,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Color(0xFF0F1E2B),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                  ),
+                ),
+              ],
             ),
           ),
-          // Ajoutez ici les widgets pour les séries ou comics, comme un CarouselSlider ou ListView.builder
+          SizedBox(height: 10),
+          Container(
+            height:
+                220.0, // Augmentez la hauteur pour accommoder le titre en dessous de l'image
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
+                final imageUrl =
+                    item['image']?['medium_url']; // Ceci peut être null.
+                final name = item['name']; // Ceci peut également être null.
+                return Container(
+                  width: 150, // Ajustez la largeur si nécessaire
+                  margin: EdgeInsets.only(right: 10),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF2D4455),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      imageUrl != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(15)),
+                              child: Image.network(
+                                // item['image']['medium_url'],
+                                imageUrl,
+                                width: 150, // Ajustez la largeur si nécessaire
+                                height: 160, // Ajustez la hauteur si nécessaire
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : Container(
+                              width: 150,
+                              height: 160,
+                              decoration: BoxDecoration(
+                                color: Colors.grey, // Placeholder color
+                                borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(15)),
+                              ),
+                              child:
+                                  Icon(Icons.broken_image), // Placeholder icon
+                            ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0, top: 5.0),
+                        child: Text(
+                          name ?? 'Titre inconnu',
+                          style: TextStyle(
+                            fontFamily: 'Nunito',
+                            color: Colors.white,
+                            fontSize: 15,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
