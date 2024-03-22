@@ -1,100 +1,404 @@
 import 'package:flutter/material.dart';
-import 'navBar.dart'; // Votre NavBar personnalisée
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_svg/flutter_svg.dart';
 
-void main() {
-  runApp(MyApp());
+import 'navBar.dart'; // Votre NavBar personnalisée
+import 'config.dart'; // Assurez-vous que cette importation est correcte
+
+class SeriesScreen extends StatefulWidget {
+  @override
+  _SeriesScreenState createState() => _SeriesScreenState();
 }
 
-class MyApp extends StatelessWidget {
+class _SeriesScreenState extends State<SeriesScreen> {
+  List<dynamic> seriesList = [];
+  final Color backgroundColor = Color(0xFF15232E); // Couleur de fond de l'écran
+  final Color cardBackgroundColor =
+      Color(0xFF1E3243); // Couleur de fond des cartes
+  bool isLoading = true; // Indicateur de chargement
+  @override
+  void initState() {
+    super.initState();
+    fetchSeries();
+  }
+
+  Future<void> fetchSeries() async {
+    final String apiKey = Config.comicVineApiKey;
+    final String apiUrl =
+        'https://comicvine.gamespot.com/api/series_list?api_key=$apiKey&format=json';
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        // Vérifiez la structure de la réponse avec un débogage
+        print(data);
+        // Mettez à jour l'état avec les nouvelles données
+        setState(() {
+          seriesList = data['results'];
+          isLoading =
+              false; // Données chargées, mise à jour de l'état de chargement
+        });
+      } else {
+        // Si le code d'état n'est pas 200, il y a une erreur
+        print('Failed to load series: ${response.statusCode}');
+        setState(() {
+          isLoading =
+              false; // Mise à jour de l'état de chargement en cas d'erreur
+        });
+      }
+    } catch (e) {
+      // Si une exception est lancée, imprimez-la et mettez à jour l'état de chargement
+      print('Failed to load series: $e');
+      setState(() {
+        isLoading =
+            false; // Mise à jour de l'état de chargement en cas d'exception
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: SeriesScreen(),
-    );
-  }
-}
-
-class SeriesScreen extends StatelessWidget {
-  final Color backgroundColor = Color(0xFF15232E);
-  final Color cardBackgroundColor = Color(0xFF1E3243);
-  final Color titleColor = Colors.white;
-  final double topPadding = 0.0; // Ajustez cette valeur en fonction de l'image fournie
-
-  @overrid
-  Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFF15232E), // Fond de l'écran
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: backgroundColor,
+        backgroundColor: Color(0xFF15232E), // Fond de la AppBar
         elevation: 0,
-      ),
-      body: Container(
-        color: backgroundColor,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: topPadding), // Espace en haut pour le titre
-            Padding(
-              padding: const EdgeInsets.only(left: 32), // Espace à gauche pour le titre
-              child: Text(
-                'Séries les plus populaires',
-                style: TextStyle(
-                  fontFamily: 'Nunito',
-                  color: titleColor,
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            SizedBox(height: 24), // Espace entre le titre et les sections
-            Expanded(
-              child: ListView.builder(
-                itemCount: 10, // Ajustez le nombre d'éléments de la liste ici
-                itemBuilder: (context, index) {
-                  return buildSection('Section ${index + 1}', cardBackgroundColor);
-                },
-              ),
-            ),
-          ],
+        title: Text(
+          'Séries les plus populaires',
+          style: TextStyle(
+              fontFamily: 'Nunito',
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold),
         ),
+        centerTitle: true, // Centre le titre si vous le souhaitez
       ),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: seriesList.length,
+              itemBuilder: (context, index) {
+                return SeriesCard(
+                  series: seriesList[index],
+                  index: index, // Passez l'index ici
+                );
+              },
+            ),
       bottomNavigationBar: NavBar(onItemSelected: (index) {
-        print('Selected index $index');
+        // Mettez à jour l'interface utilisateur ou naviguez vers une nouvelle page
       }),
     );
   }
+}
 
-  Widget buildSection(String title, Color color) {
+/*class SeriesCard extends StatelessWidget {
+  //final dynamic series;
+  final Map<String, dynamic> series;
+  final int index; // Ajout d'un index pour afficher le numéro de classement
+
+  SeriesCard({required this.series, required this.index});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      height: 150, // Hauteur fixe pour les sections, ajustez selon la capture d'écran
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Ajustez selon la capture d'écran
+      height: 150,
+      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color,
+        color: Color(0xFF1E3243), // La couleur de fond de la carte
         borderRadius: BorderRadius.circular(8),
       ),
-      child: ListTile(
-        title: Text(
-          title,
-          style: TextStyle(
-            fontFamily: 'Nunito',
-            color: titleColor,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+      child: Stack(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(8),
+                    bottomLeft: Radius.circular(8),
+                  ),
+                  child: Image.network(
+                    series['image']['medium_url'],
+                    height: 150,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        series['name'] ?? 'Titre inconnu',
+                        style: TextStyle(
+                          fontFamily: 'Nunito',
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        series['publisher'] != null
+                            ? (series['publisher']['name'] ?? 'Inconnu')
+                            : 'Inconnu',
+                        style: TextStyle(
+                          fontFamily: 'Nunito',
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        'Épisodes: ${series['count_of_episodes'] ?? 'N/A'}',
+                        style: TextStyle(
+                          fontFamily: 'Nunito',
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+                      Text(
+                        'Année: ${series['start_year'] ?? 'N/A'}',
+                        style: TextStyle(
+                          fontFamily: 'Nunito',
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-        subtitle: Text(
-          'Sous-titre', // Remplacez ceci par les données réelles
-          style: TextStyle(
-            fontFamily: 'Nunito',
-            color: Colors.white.withOpacity(0.7),
-            fontSize: 14,
+          Positioned(
+            top: 8,
+            left: 8,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.orange,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                '#${index + 1}',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
           ),
-        ),
+          // Informations de la série avec les icônes SVG
+          Positioned(
+            top: 50, // Ajustez cette valeur en fonction de votre layout
+            left: 160, // Ajustez cette valeur en fonction de votre layout
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    SvgPicture.asset('assets/images/ic_publisher_bicolor.svg',
+                        width: 16, height: 16),
+                    SizedBox(width: 8),
+                    Text(
+                      series['publisher'] ?? 'Inconnu', // À remplacer par les données réelles de l'API
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    SvgPicture.asset('assets/images/ic_tv_bicolor.svg',
+                        width: 16, height: 16),
+                    SizedBox(width: 8),
+                    Text(
+                      '${series['count_of_episodes'] ?? 'N/A'} épisodes',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    SvgPicture.asset('assets/iamges/ic_calendar_bicolor.svg',
+                        width: 16, height: 16),
+                    SizedBox(width: 8),
+                    Text(
+                      'Année: ${series['start_year'] ?? 'N/A'}',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}*/
+
+class SeriesCard extends StatelessWidget {
+  final Map<String, dynamic> series; // Ensure this is a Map
+  final int index;
+
+  SeriesCard({required this.series, required this.index});
+
+  @override
+  Widget build(BuildContext context) {
+    // Assuming series['image'] and series['image']['medium_url'] are the correct paths.
+    // Make sure they exist and are not null before trying to use them.
+    String imageUrl = series['image']?['medium_url'] ?? 'default_image_url';
+    String name = series['name'] ?? 'Titre inconnu';
+    String publisherName = series['publisher']?['name'] ?? 'Inconnu';
+    String episodes = series['count_of_episodes']?.toString() ?? 'N/A';
+    String year = series['start_year']?.toString() ?? 'N/A';
+
+    return Container(
+      height: 150,
+      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Color(0xFF1E3243),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Stack(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(8),
+                    bottomLeft: Radius.circular(8),
+                  ),
+                  child: Image.network(
+                    imageUrl,
+                    height: 150,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Center(child: Text('Image not available')); // Fallback text
+                    },
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        name,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      // Use SvgPicture.asset to display your SVG icons
+                      // Make sure you have the flutter_svg package added to your pubspec.yaml
+                      // Replace 'assets/your_icon.svg' with your actual asset path
+                      Row(
+                        children: [
+                          SvgPicture.asset(
+                            'assets/images/ic_publisher_bicolor.svg',
+                            width: 14,
+                            height: 14,
+                            color: Colors.white.withOpacity(0.7),
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            publisherName,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          SvgPicture.asset(
+                            'assets/images/ic_tv_bicolor.svg',
+                            width: 14,
+                            height: 14,
+                            color: Colors.white.withOpacity(0.7),
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            episodes,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          SvgPicture.asset(
+                            'assets/images/ic_calendar_bicolor.svg',
+                            width: 14,
+                            height: 14,
+                            color: Colors.white.withOpacity(0.7),
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            year,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      // Repeat similar rows for episodes and year using their respective icons
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            top: 8,
+            left: 8,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.orange,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                '#${index + 1}',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
