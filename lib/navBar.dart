@@ -20,10 +20,26 @@ class _NavBarState extends State<NavBar> {
       _selectedIndex = index;
     });
 
-    if (index == 2) { // Si l'onglet "Séries" est sélectionné, utilisez Navigator pour afficher la SeriesScreen
-      Navigator.pushNamed(context, '/series');
-    } else {
-      widget.onItemSelected(index);
+    switch (_selectedIndex) {
+      case 0:
+        Navigator.pushNamed(context, '/home');
+        break;
+      case 1:
+        Navigator.pushNamed(context, '/comics'); // Assurez-vous qu'il n'y a pas d'espace ici
+        break;
+
+      case 2:
+      // Navigator logic for "Séries" tab
+        Navigator.pushNamed(context, '/series');
+        break;
+      case 3:
+        Navigator.pushNamed(context, '/films');
+        break;
+      case 4:
+       Navigator.pushNamed(context, '/search');
+        break;
+      default:
+        widget.onItemSelected(index);
     }
   }
 

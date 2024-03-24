@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:projet_prog_mobile/liste_comics.dart';
+import 'package:projet_prog_mobile/liste_films.dart';
 import 'ecran_acceuil.dart'; // Importez HomeScreen depuis ecran_acceuil.dart
 import 'liste_serie.dart'; // Importez SeriesScreen depuis liste_serie.dart
 
@@ -15,7 +17,10 @@ class MyApp extends StatelessWidget {
       ),
       home: HomeScreen(), // Assurez-vous que HomeScreen est bien défini dans ecran_acceuil.dart
       routes: {
-        '/series': (context) => SeriesScreen(), // Ajoutez une route pour la SeriesScreen
+        '/home': (context) => HomeScreen(),
+        '/comics': (context) => ComicsScreen(),
+        '/series': (context) => SeriesScreen(),
+        '/films': (context) => FilmsScreen(), // Page de comics// Page de comics// Ajoutez une route pour la SeriesScreen
       },
     );
   }
