@@ -53,35 +53,26 @@ class _ComicsScreenState extends State<ComicsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFF15232E),
-      appBar: AppBar(
-        backgroundColor: Color(0xFF15232E),
-        automaticallyImplyLeading: false,
-        elevation: 0,
-        title: Align(
-          alignment: Alignment.topLeft,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Comics les plus',
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(100.0), // Vous pouvez ajuster ceci pour augmenter la hauteur de l'AppBar.
+        child: AppBar(
+          backgroundColor: Color(0xFF15232E),
+          automaticallyImplyLeading: false,
+          elevation: 0,
+          flexibleSpace: Padding(
+            padding: const EdgeInsets.only(left: 32.0, top: 34.0), // Ajustez l'espacement ici selon votre capture d'écran.
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: Text(
+                'Comics les plus populaires', // Utilisez les styles de votre capture d'écran.
                 style: TextStyle(
                   fontFamily: 'Nunito',
                   color: Colors.white,
-                  fontSize: 30,
+                  fontSize: 30, // La taille de la police de votre capture d'écran.
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Text(
-                'populaires',
-                style: TextStyle(
-                  fontFamily: 'Nunito',
-                  color: Colors.white,
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -112,97 +103,123 @@ class ComicsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String imageUrl = comic['image']?['medium_url'] ?? 'default_image_url';
-    String title = comic['name'] ?? 'Unknown Title';
-    // Pour les comics, vous pouvez avoir besoin d'attributs différents de ceux pour les séries.
-    // Vérifiez votre réponse API pour les attributs corrects.
-    String issueNumber = comic['issue_number']?.toString() ?? 'N/A'; // Exemple d'un autre attribut.
-    // Les variables 'publisherName', 'episodes', et 'year' doivent être remplacées par des attributs appropriés de comics.
+    // Tailles définies à partir de la capture d'écran
+    final double cardWidth = 359.0;
+    final double cardHeight = 164.0;
 
-    return Card(
-      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      color: Color(0xFF1E3243),
-      child: Stack(
-        children: [
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Center(child: Text('Image not available'));
-                        },
+    String imageUrl = comic['image']?['medium_url'] ?? 'default_image_url';
+    String name = comic['name'] ?? 'Unknown Title';
+    String publisherName = comic['publisher']?['name'] ?? 'Unknown';
+    String episodes = comic['count_of_episodes']?.toString() ?? 'N/A';
+    String year = comic['start_year']?.toString() ?? 'N/A';
+
+    return Container(
+      width: cardWidth,
+      height: cardHeight,
+      child: Card(
+        margin: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        color: Color(0xFF1E3243),
+        child: Stack(
+          children: [
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Center(child: Text('Image not available'));
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          title, // Utilisez 'title' au lieu de 'name'
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                  Expanded(
+                    flex: 2,
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            name,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Issue #$issueNumber', // Utilisez 'issueNumber'
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white.withOpacity(0.7),
+                          SizedBox(height: 4),
+                          Text(
+                            publisherName,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white.withOpacity(0.7),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        // Vous pouvez ajouter plus de Text widgets pour d'autres informations
-                      ],
+                          SizedBox(height: 4),
+                          Text(
+                            'Épisodes: $episodes',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white.withOpacity(0.7),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Année: $year',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white.withOpacity(0.7),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            top: 10,
-            left: 10,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.orange,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                '#${index + 1}',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+                ],
               ),
             ),
-          ),
-        ],
+            Positioned(
+              top: 10,
+              left: 10,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  '#${index + 1}',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-}// Assurez-vous que le widget NavBar est bien défini ailleurs dans votre code.
+}
