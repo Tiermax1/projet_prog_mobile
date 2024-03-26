@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projet_prog_mobile/liste_comics.dart';
 import 'package:projet_prog_mobile/liste_films.dart';
+import 'package:projet_prog_mobile/recherche.dart';
 import 'ecran_acceuil.dart'; // Importez HomeScreen depuis ecran_acceuil.dart
 import 'liste_serie.dart'; // Importez SeriesScreen depuis liste_serie.dart
 
@@ -20,9 +21,10 @@ class MyApp extends StatelessWidget {
         '/home': (context) => HomeScreen(),
         '/comics': (context) => ComicsScreen(),
         '/series': (context) => SeriesScreen(),
-        '/films': (context) => FilmsScreen(), // Page de comics// Page de comics// Ajoutez une route pour la SeriesScreen
+        '/films': (context) => FilmsScreen(),
+        '/search': (context) => SearchPage(),
+        // Page de comics// Page de comics// Ajoutez une route pour la SeriesScreen
       },
     );
   }
 }
-

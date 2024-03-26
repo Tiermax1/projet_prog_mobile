@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'navBar.dart'; // Votre NavBar personnalisée
-import 'config.dart'; // Votre configuration
+import 'config.dart'; // Assurez-vous que cette importation est correcte
 
 class FilmsScreen extends StatefulWidget {
   @override
-  _FilmScreenState createState() => _FilmScreenState();
+  _FilmsScreenState createState() => _FilmsScreenState();
 }
 
-class _FilmScreenState extends State<FilmsScreen> {
+class _FilmsScreenState extends State<FilmsScreen> {
   List<dynamic> filmsList = [];
-  bool isLoading = true;
-
+  final Color backgroundColor = Color(0xFF15232E); // Couleur de fond de l'écran
+  final Color cardBackgroundColor =
+  Color(0xFF1E3243); // Couleur de fond des cartes
+  bool isLoading = true; // Indicateur de chargement
   @override
   void initState() {
     super.initState();
@@ -30,20 +32,28 @@ class _FilmScreenState extends State<FilmsScreen> {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        // Vérifiez la structure de la réponse avec un débogage
+        print(data);
+        // Mettez à jour l'état avec les nouvelles données
         setState(() {
           filmsList = data['results'];
-          isLoading = false;
+          isLoading =
+          false; // Données chargées, mise à jour de l'état de chargement
         });
       } else {
-        print('Failed to load films list');
+        // Si le code d'état n'est pas 200, il y a une erreur
+        print('Failed to load films: ${response.statusCode}');
         setState(() {
-          isLoading = false;
+          isLoading =
+          false; // Mise à jour de l'état de chargement en cas d'erreur
         });
       }
     } catch (e) {
-      print('Exception caught: $e');
+      // Si une exception est lancée, imprimez-la et mettez à jour l'état de chargement
+      print('Failed to load films: $e');
       setState(() {
-        isLoading = false;
+        isLoading =
+        false; // Mise à jour de l'état de chargement en cas d'exception
       });
     }
   }
@@ -63,7 +73,7 @@ class _FilmScreenState extends State<FilmsScreen> {
             child: Align(
               alignment: Alignment.bottomLeft,
               child: Text(
-                'Films les plus populaires', // Utilisez les styles de votre capture d'écran.
+                'Films les plus\npopulaires', // Utilisez les styles de votre capture d'écran.
                 style: TextStyle(
                   fontFamily: 'Nunito',
                   color: Colors.white,
@@ -88,7 +98,7 @@ class _FilmScreenState extends State<FilmsScreen> {
         },
       ),
       bottomNavigationBar: NavBar(onItemSelected: (index) {
-        // Interaction logic here
+        // Mettez à jour l'interface utilisateur ou naviguez vers une nouvelle page
       }),
     );
   }
@@ -102,122 +112,134 @@ class FilmsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Tailles définies à partir de la capture d'écran
-    final double cardWidth = 359.0;
-    final double cardHeight = 164.0;
-
-    String imageUrl = films['image']?['medium_url'] ?? 'default_image_url';
-    String name = films['name'] ?? 'Unknown Title';
-    String publisherName = films['publisher']?['name'] ?? 'Unknown';
+    String imageUrl = films['image']?['medium_url'] ?? 'assets/images/default_image.png';
+    String name = films['name'] ?? 'Titre inconnu';
+    String publisherName = films['publisher']?['name'] ?? 'Inconnu';
     String episodes = films['count_of_episodes']?.toString() ?? 'N/A';
     String year = films['start_year']?.toString() ?? 'N/A';
 
     return Container(
-      width: cardWidth,
-      height: cardHeight,
-      child: Card(
-        margin: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        color: Color(0xFF1E3243),
-        child: Stack(
-          children: [
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+      height: 150,
+      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Color(0xFF1E3243), // Adjusted the color to match the design
+        borderRadius: BorderRadius.circular(10), // Adjusted the radius to match the design
+      ),
+      child: Stack(
+        alignment: Alignment.centerLeft,
+        children: [
+          Positioned(
+            top: (150 - 133) / 2, // Centering the image vertically
+            left: 22, // Position from the left as per design
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10), // Rounded corners as per design
+              child: Image.network(
+                imageUrl,
+                width: 129, // Width as per design
+                height: 133, // Height as per design
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Center(child: Text('Image not available'));
+                },
+              ),
+            ),
+          ),
+          Positioned(
+            left: 150, // Assuming the image plus some padding to the right
+            right: 0,
+            child: Padding(
+              padding: EdgeInsets.only(left: 10, top: 10, right: 10, bottom: 10), // Padding inside the container
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          imageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Center(child: Text('Image not available'));
-                          },
+                  Text(
+                    name,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/images/ic_publisher_bicolor.svg',
+                        width: 14,
+                        height: 14,
+                        color: Colors.white.withOpacity(0.7),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        publisherName,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            name,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            publisherName,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white.withOpacity(0.7),
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'Épisodes: $episodes',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white.withOpacity(0.7),
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'Année: $year',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white.withOpacity(0.7),
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                  Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/images/ic_tv_bicolor.svg',
+                        width: 14,
+                        height: 14,
+                        color: Colors.white.withOpacity(0.7),
                       ),
-                    ),
+                      SizedBox(width: 8),
+                      Text(
+                        episodes + ' épisodes',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/images/ic_calendar_bicolor.svg',
+                        width: 14,
+                        height: 14,
+                        color: Colors.white.withOpacity(0.7),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        year,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-            Positioned(
-              top: 10,
-              left: 10,
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.orange,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  '#${index + 1}',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+          ),
+          Positioned(
+            top: 8,
+            left: 8,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.orange,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                '#${index + 1}',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -73,7 +73,7 @@ class _SeriesScreenState extends State<SeriesScreen> {
             child: Align(
               alignment: Alignment.bottomLeft,
               child: Text(
-                'Comics les plus populaires', // Utilisez les styles de votre capture d'écran.
+                'Series les plus populaires', // Utilisez les styles de votre capture d'écran.
                 style: TextStyle(
                   fontFamily: 'Nunito',
                   color: Colors.white,
@@ -104,18 +104,15 @@ class _SeriesScreenState extends State<SeriesScreen> {
   }
 }
 
-
 class SeriesCard extends StatelessWidget {
-  final Map<String, dynamic> series; // Ensure this is a Map
+  final Map<String, dynamic> series;
   final int index;
 
   SeriesCard({required this.series, required this.index});
 
   @override
   Widget build(BuildContext context) {
-    // Assuming series['image'] and series['image']['medium_url'] are the correct paths.
-    // Make sure they exist and are not null before trying to use them.
-    String imageUrl = series['image']?['medium_url'] ?? 'default_image_url';
+    String imageUrl = series['image']?['medium_url'] ?? 'assets/images/default_image.png';
     String name = series['name'] ?? 'Titre inconnu';
     String publisherName = series['publisher']?['name'] ?? 'Inconnu';
     String episodes = series['count_of_episodes']?.toString() ?? 'N/A';
@@ -125,110 +122,103 @@ class SeriesCard extends StatelessWidget {
       height: 150,
       margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Color(0xFF1E3243),
-        borderRadius: BorderRadius.circular(8),
+        color: Color(0xFF1E3243), // Adjusted the color to match the design
+        borderRadius: BorderRadius.circular(10), // Adjusted the radius to match the design
       ),
       child: Stack(
+        alignment: Alignment.centerLeft,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(8),
-                    bottomLeft: Radius.circular(8),
-                  ),
-                  child: Image.network(
-                    imageUrl,
-                    height: 150,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Center(child: Text('Image not available')); // Fallback text
-                    },
-                  ),
-                ),
+          Positioned(
+            top: (150 - 133) / 2, // Centering the image vertically
+            left: 22, // Position from the left as per design
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10), // Rounded corners as per design
+              child: Image.network(
+                imageUrl,
+                width: 129, // Width as per design
+                height: 133, // Height as per design
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Center(child: Text('Image not available'));
+                },
               ),
-              Expanded(
-                flex: 2,
-                child: Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+            ),
+          ),
+          Positioned(
+            left: 150, // Assuming the image plus some padding to the right
+            right: 0,
+            child: Padding(
+              padding: EdgeInsets.only(left: 10, top: 10, right: 10, bottom: 10), // Padding inside the container
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    name,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Row(
                     children: [
+                      SvgPicture.asset(
+                        'assets/images/ic_publisher_bicolor.svg',
+                        width: 14,
+                        height: 14,
+                        color: Colors.white.withOpacity(0.7),
+                      ),
+                      SizedBox(width: 8),
                       Text(
-                        name,
+                        publisherName,
                         style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
                         ),
-                        overflow: TextOverflow.ellipsis,
                       ),
-                      // Use SvgPicture.asset to display your SVG icons
-                      // Make sure you have the flutter_svg package added to your pubspec.yaml
-                      // Replace 'assets/your_icon.svg' with your actual asset path
-                      Row(
-                        children: [
-                          SvgPicture.asset(
-                            'assets/images/ic_publisher_bicolor.svg',
-                            width: 14,
-                            height: 14,
-                            color: Colors.white.withOpacity(0.7),
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            publisherName,
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.7),
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          SvgPicture.asset(
-                            'assets/images/ic_tv_bicolor.svg',
-                            width: 14,
-                            height: 14,
-                            color: Colors.white.withOpacity(0.7),
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            episodes,
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.7),
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          SvgPicture.asset(
-                            'assets/images/ic_calendar_bicolor.svg',
-                            width: 14,
-                            height: 14,
-                            color: Colors.white.withOpacity(0.7),
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            year,
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.7),
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      // Repeat similar rows for episodes and year using their respective icons
                     ],
                   ),
-                ),
+                  Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/images/ic_tv_bicolor.svg',
+                        width: 14,
+                        height: 14,
+                        color: Colors.white.withOpacity(0.7),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        episodes + ' épisodes',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/images/ic_calendar_bicolor.svg',
+                        width: 14,
+                        height: 14,
+                        color: Colors.white.withOpacity(0.7),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        year,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
           Positioned(
             top: 8,
