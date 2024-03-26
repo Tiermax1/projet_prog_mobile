@@ -26,7 +26,7 @@ class _ComicsScreenState extends State<ComicsScreen> {
   Future<void> fetchComics() async {
     final String apiKey = Config.comicVineApiKey;
     final String apiUrl =
-        'https://comicvine.gamespot.com/api/comics_list?api_key=$apiKey&format=json';
+        'https://comicvine.gamespot.com/api/issues?api_key=$apiKey&format=json';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -113,7 +113,7 @@ class ComicsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String imageUrl = comics['image']?['medium_url'] ?? 'assets/images/default_image.png';
-    String name = comics['name'] ?? 'Titre inconnu';
+    String name = comics['volume']['name'] ?? 'Titre inconnu';
     String publisherName = comics['publisher']?['name'] ?? 'Inconnu';
     String episodes = comics['count_of_episodes']?.toString() ?? 'N/A';
     String year = comics['start_year']?.toString() ?? 'N/A';

@@ -13,10 +13,10 @@ class FilmsScreen extends StatefulWidget {
 
 class _FilmsScreenState extends State<FilmsScreen> {
   List<dynamic> filmsList = [];
-  final Color backgroundColor = Color(0xFF15232E); // Couleur de fond de l'écran
-  final Color cardBackgroundColor =
-  Color(0xFF1E3243); // Couleur de fond des cartes
-  bool isLoading = true; // Indicateur de chargement
+  final Color backgroundColor = Color(0xFF15232E);
+  final Color cardBackgroundColor = Color(0xFF1E3243);
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -25,51 +25,48 @@ class _FilmsScreenState extends State<FilmsScreen> {
 
   Future<void> fetchFilms() async {
     final String apiKey = Config.comicVineApiKey;
-    final String apiUrl =
-        'https://comicvine.gamespot.com/api/films_list?api_key=$apiKey&format=json';
+    // Assurez-vous que cette URL est correcte et conforme à la documentation de l'API
+    final String apiUrl = 'https://comicvine.gamespot.com/api/movies?api_key=$apiKey&format=json';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        // Vérifiez la structure de la réponse avec un débogage
-        print(data);
-        // Mettez à jour l'état avec les nouvelles données
         setState(() {
           filmsList = data['results'];
-          isLoading =
-          false; // Données chargées, mise à jour de l'état de chargement
+          isLoading = false;
         });
       } else {
-        // Si le code d'état n'est pas 200, il y a une erreur
         print('Failed to load films: ${response.statusCode}');
         setState(() {
-          isLoading =
-          false; // Mise à jour de l'état de chargement en cas d'erreur
+          isLoading = false;
         });
       }
     } catch (e) {
-      // Si une exception est lancée, imprimez-la et mettez à jour l'état de chargement
       print('Failed to load films: $e');
       setState(() {
-        isLoading =
-        false; // Mise à jour de l'état de chargement en cas d'exception
+        isLoading = false;
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFF15232E),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(100.0), // Vous pouvez ajuster ceci pour augmenter la hauteur de l'AppBar.
+        preferredSize: Size.fromHeight(
+            100.0), // Vous pouvez ajuster ceci pour augmenter la hauteur de l'AppBar.
         child: AppBar(
           backgroundColor: Color(0xFF15232E),
           automaticallyImplyLeading: false,
           elevation: 0,
           flexibleSpace: Padding(
-            padding: const EdgeInsets.only(left: 32.0, top: 34.0), // Ajustez l'espacement ici selon votre capture d'écran.
+            padding: const EdgeInsets.only(
+                left: 32.0,
+                top:
+                    34.0), // Ajustez l'espacement ici selon votre capture d'écran.
             child: Align(
               alignment: Alignment.bottomLeft,
               child: Text(
@@ -77,7 +74,8 @@ class _FilmsScreenState extends State<FilmsScreen> {
                 style: TextStyle(
                   fontFamily: 'Nunito',
                   color: Colors.white,
-                  fontSize: 30, // La taille de la police de votre capture d'écran.
+                  fontSize:
+                      30, // La taille de la police de votre capture d'écran.
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -88,15 +86,15 @@ class _FilmsScreenState extends State<FilmsScreen> {
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : ListView.builder(
-        padding: EdgeInsets.symmetric(vertical: 20),
-        itemCount: filmsList.length,
-        itemBuilder: (context, index) {
-          return FilmsCard(
-            films: filmsList[index],
-            index: index,
-          );
-        },
-      ),
+              padding: EdgeInsets.symmetric(vertical: 20),
+              itemCount: filmsList.length,
+              itemBuilder: (context, index) {
+                return FilmsCard(
+                  films: filmsList[index],
+                  index: index,
+                );
+              },
+            ),
       bottomNavigationBar: NavBar(onItemSelected: (index) {
         // Mettez à jour l'interface utilisateur ou naviguez vers une nouvelle page
       }),
@@ -112,18 +110,19 @@ class FilmsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String imageUrl = films['image']?['medium_url'] ?? 'assets/images/default_image.png';
+    String imageUrl =
+        films['image']?['medium_url'] ?? 'assets/images/default_image.png';
     String name = films['name'] ?? 'Titre inconnu';
-    String publisherName = films['publisher']?['name'] ?? 'Inconnu';
-    String episodes = films['count_of_episodes']?.toString() ?? 'N/A';
-    String year = films['start_year']?.toString() ?? 'N/A';
-
+    String time = films['runtime']?.toString() ?? 'N/A';
+    String releaseDate = films['release_date']?.toString() ?? 'N/A';
+    String year = releaseDate.isNotEmpty ? releaseDate.substring(0, 4) : 'N/A';
     return Container(
       height: 150,
       margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: Color(0xFF1E3243), // Adjusted the color to match the design
-        borderRadius: BorderRadius.circular(10), // Adjusted the radius to match the design
+        borderRadius: BorderRadius.circular(
+            10), // Adjusted the radius to match the design
       ),
       child: Stack(
         alignment: Alignment.centerLeft,
@@ -132,7 +131,8 @@ class FilmsCard extends StatelessWidget {
             top: (150 - 133) / 2, // Centering the image vertically
             left: 22, // Position from the left as per design
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(10), // Rounded corners as per design
+              borderRadius:
+                  BorderRadius.circular(10), // Rounded corners as per design
               child: Image.network(
                 imageUrl,
                 width: 129, // Width as per design
@@ -148,7 +148,11 @@ class FilmsCard extends StatelessWidget {
             left: 150, // Assuming the image plus some padding to the right
             right: 0,
             child: Padding(
-              padding: EdgeInsets.only(left: 10, top: 10, right: 10, bottom: 10), // Padding inside the container
+              padding: EdgeInsets.only(
+                  left: 10,
+                  top: 10,
+                  right: 10,
+                  bottom: 10), // Padding inside the container
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -165,32 +169,14 @@ class FilmsCard extends StatelessWidget {
                   Row(
                     children: [
                       SvgPicture.asset(
-                        'assets/images/ic_publisher_bicolor.svg',
+                        'assets/images/ic_movie_bicolor.svg',
                         width: 14,
                         height: 14,
                         color: Colors.white.withOpacity(0.7),
                       ),
                       SizedBox(width: 8),
                       Text(
-                        publisherName,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/images/ic_tv_bicolor.svg',
-                        width: 14,
-                        height: 14,
-                        color: Colors.white.withOpacity(0.7),
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        episodes + ' épisodes',
+                        time + ' minutes',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
