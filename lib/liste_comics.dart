@@ -98,7 +98,6 @@ class _ComicsScreenState extends State<ComicsScreen> {
         },
       ),
       bottomNavigationBar: NavBar(onItemSelected: (index) {
-        // Mettez à jour l'interface utilisateur ou naviguez vers une nouvelle page
       }),
     );
   }
@@ -114,9 +113,9 @@ class ComicsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     String imageUrl = comics['image']?['medium_url'] ?? 'assets/images/default_image.png';
     String name = comics['volume']['name'] ?? 'Titre inconnu';
-    String publisherName = comics['publisher']?['name'] ?? 'Inconnu';
-    String episodes = comics['count_of_episodes']?.toString() ?? 'N/A';
-    String year = comics['start_year']?.toString() ?? 'N/A';
+    String description = comics['deck'] ?? 'N/A';
+    String numero = comics['issue_number']?.toString() ?? 'N/A';
+    String year = comics['cover_date']?.toString() ?? 'N/A';
 
     return Container(
       height: 150,
@@ -164,15 +163,8 @@ class ComicsCard extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      SvgPicture.asset(
-                        'assets/images/ic_publisher_bicolor.svg',
-                        width: 14,
-                        height: 14,
-                        color: Colors.white.withOpacity(0.7),
-                      ),
-                      SizedBox(width: 8),
                       Text(
-                        publisherName,
+                        description,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
@@ -183,14 +175,14 @@ class ComicsCard extends StatelessWidget {
                   Row(
                     children: [
                       SvgPicture.asset(
-                        'assets/images/ic_tv_bicolor.svg',
+                        'assets/images/ic_books_bicolor.svg',
                         width: 14,
                         height: 14,
                         color: Colors.white.withOpacity(0.7),
                       ),
                       SizedBox(width: 8),
                       Text(
-                        episodes + ' épisodes',
+                        'N°' + numero,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,

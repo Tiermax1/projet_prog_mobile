@@ -27,7 +27,6 @@ class _NavBarState extends State<NavBar> {
       case 1:
         Navigator.pushNamed(context, '/comics'); // Assurez-vous qu'il n'y a pas d'espace ici
         break;
-
       case 2:
       // Navigator logic for "Séries" tab
         Navigator.pushNamed(context, '/series');

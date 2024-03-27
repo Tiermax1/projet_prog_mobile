@@ -215,7 +215,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 final item = items[index];
                 final imageUrl =
                     item['image']?['medium_url']; // Ceci peut être null.
-                final name = item['name']; // Ceci peut également être null.
+                // Modification ici pour la logique de détermination du nom
+                String name;
+                if (item.containsKey('volume')) { // Supposons que cela indique un comic
+                  name = item['volume']['name'];
+                } else { // Pour films et séries
+                  name = item['name'];
+                }
+
                 return Container(
                   width: 150, // Ajustez la largeur si nécessaire
                   margin: EdgeInsets.only(right: 10),
