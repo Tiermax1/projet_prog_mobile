@@ -7,7 +7,6 @@ import 'liste_serie.dart';
 import 'liste_films.dart';
 import 'liste_comics.dart';// Importez SeriesScreen depuis liste_serie.dart
 
-GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {

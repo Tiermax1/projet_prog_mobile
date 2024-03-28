@@ -15,7 +15,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> comics = [];
   List<dynamic> movies = [];
   bool isLoading = true;
-
+  PageController _pageController = PageController();
   @override
   void initState() {
     super.initState();
@@ -114,6 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
+        controller: _pageController,
               child: Column(
                 children: [
                   buildSection(
@@ -135,7 +136,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
       bottomNavigationBar: NavBar(onItemSelected: (index) {
-        // Mettez à jour l'interface utilisateur ou naviguez vers une nouvelle page
       }),
     );
   }

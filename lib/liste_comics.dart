@@ -113,7 +113,7 @@ class ComicsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     String imageUrl = comics['image']?['medium_url'] ?? 'assets/images/default_image.png';
     String name = comics['volume']['name'] ?? 'Titre inconnu';
-    String description = comics['deck'] ?? 'N/A';
+    String description = comics['name'] ?? 'N/A';
     String numero = comics['issue_number']?.toString() ?? 'N/A';
     String year = comics['cover_date']?.toString() ?? 'N/A';
 
