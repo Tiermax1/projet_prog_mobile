@@ -58,6 +58,7 @@ class _SeriesScreenState extends State<SeriesScreen> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,9 +98,7 @@ class _SeriesScreenState extends State<SeriesScreen> {
           );
         },
       ),
-      bottomNavigationBar: NavBar(onItemSelected: (index) {
-        // Mettez à jour l'interface utilisateur ou naviguez vers une nouvelle page
-      }),
+
     );
   }
 }

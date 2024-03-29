@@ -22,6 +22,13 @@ class _ComicsScreenState extends State<ComicsScreen> {
     super.initState();
     fetchComics();
   }
+  int _selectedIndex = 0;
+
+  void _onNavItemSelected(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   Future<void> fetchComics() async {
     final String apiKey = Config.comicVineApiKey;
@@ -97,8 +104,7 @@ class _ComicsScreenState extends State<ComicsScreen> {
           );
         },
       ),
-      bottomNavigationBar: NavBar(onItemSelected: (index) {
-      }),
+
     );
   }
 }

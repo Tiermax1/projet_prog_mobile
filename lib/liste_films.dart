@@ -95,9 +95,7 @@ class _FilmsScreenState extends State<FilmsScreen> {
                 );
               },
             ),
-      bottomNavigationBar: NavBar(onItemSelected: (index) {
-        // Mettez à jour l'interface utilisateur ou naviguez vers une nouvelle page
-      }),
+
     );
   }
 }

@@ -1,15 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:projet_prog_mobile/liste_comics.dart';
-import 'package:projet_prog_mobile/liste_films.dart';
-import 'package:projet_prog_mobile/recherche.dart';
-import 'ecran_acceuil.dart'; // Importez HomeScreen depuis ecran_acceuil.dart
-import 'liste_serie.dart';
+import 'liste_comics.dart';
 import 'liste_films.dart';
-import 'liste_comics.dart';// Importez SeriesScreen depuis liste_serie.dart
+import 'recherche.dart';
+import 'ecran_acceuil.dart';
+import 'liste_serie.dart';
+import 'navBar.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _pages = [
+    HomeScreen(),
+    ComicsScreen(),
+    SeriesScreen(),
+    FilmsScreen(),
+    SearchPage(),
+  ];
+
+  void _onNavItemSelected(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,15 +38,16 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: HomeScreen(), // Assurez-vous que HomeScreen est bien défini dans ecran_acceuil.dart
-      routes: {
-        '/home': (context) => HomeScreen(),
-        '/comics': (context) => ComicsScreen(),
-        '/series': (context) => SeriesScreen(),
-        '/films': (context) => FilmsScreen(),
-        '/search': (context) => SearchPage(),
-        // Page de comics// Page de comics// Ajoutez une route pour la SeriesScreen
-      },
+      home: Scaffold(
+        body: IndexedStack(
+          index: _selectedIndex,
+          children: _pages,
+        ),
+        bottomNavigationBar: NavBar(
+          selectedIndex: _selectedIndex,
+          onItemSelected: _onNavItemSelected,
+        ),
+      ),
     );
   }
 }

@@ -1,8 +1,19 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'navBar.dart'; // Ensure this is the correct import for your custom NavBar
+import 'package:http/http.dart' as http;
+import 'navBar.dart';
+import 'config.dart';
+import 'main.dart';
 
-class SearchPage extends StatelessWidget {
+
+class SearchPage extends StatefulWidget {
+  @override
+  _SearchPageState createState() => _SearchPageState();
+}
+
+class _SearchPageState extends State<SearchPage> {
+
   @override
   Widget build(BuildContext context) {
     // Assuming 375 is the width based on the design specification provided
@@ -88,9 +99,6 @@ class SearchPage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: NavBar(onItemSelected: (index) {
-        // Mettez à jour l'interface utilisateur ou naviguez vers une nouvelle page
-      }), // Your custom bottom navigation bar
     );
   }
 }
