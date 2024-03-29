@@ -93,48 +93,67 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
+    // Use MediaQuery to get the status bar height
+    final statusBarHeight = MediaQuery.of(context).padding.top;
+
     return Scaffold(
       backgroundColor: Color(0xFF15232E),
-      appBar: AppBar(
-        backgroundColor: Color(0xFF15232E),
-        elevation: 0,
-        title: Padding(
-          padding: const EdgeInsets.only(left: 20.0, top: 30),
-          child: Text(
-            'Bienvenue !',
-            style: TextStyle(
-                fontFamily: 'Nunito',
-                color: Colors.white,
-                fontSize: 30,
-                fontWeight: FontWeight.bold),
-          ),
-        ),
-      ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Column(
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverToBoxAdapter(
+            child: Container(
+              padding: EdgeInsets.only(top: statusBarHeight + 20), // Adjust the space for the status bar
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  buildSection(
-                    title: 'Séries populaires',
-                    items: series,
-                    context: context,
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      'Bienvenue !',
+                      style: TextStyle(
+                        fontFamily: 'Nunito',
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                  buildSection(
-                    title: 'Comics populaires',
-                    items: comics,
-                    context: context,
-                  ),
-                  buildSection(
-                    title: 'Films populaires',
-                    items: movies,
-                    context: context,
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: SvgPicture.asset(
+                      'assets/images/astronaut.svg', // Correct path to your SVG image
+                      height: 80, // Adjust the size of the astronaut image
+                    ),
                   ),
                 ],
               ),
             ),
-
+          ),
+          // Add your sliver list content after the header
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                // Replace with your actual content widgets
+                buildSection(
+                  title: 'Séries populaires',
+                  items: series,
+                  context: context,
+                ),
+                buildSection(
+                  title: 'Comics populaires',
+                  items: comics,
+                  context: context,
+                ),
+                buildSection(
+                  title: 'Films populaires',
+                  items: movies,
+                  context: context,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
