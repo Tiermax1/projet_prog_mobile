@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:projet_prog_mobile/recherche.dart';
 import '../bloc/movies/movies_bloc.dart';
 import '../bloc/movies/movies_event.dart';
 import '../bloc/movies/movies_state.dart';
 import '../widgets/movies_card.dart';
 import '../widgets/nav_bar.dart';
+import 'home_screen.dart';
+import 'comics_screen.dart';
+import 'series_screen.dart';
 
 class FilmsScreen extends StatelessWidget {
   @override

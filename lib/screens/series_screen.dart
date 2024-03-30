@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:projet_prog_mobile/recherche.dart';
 import '../bloc/series/series_bloc.dart';
 import '../bloc/series/series_event.dart';
 import '../bloc/series/series_state.dart';
 import '../widgets/series_card.dart';
 import '../widgets/nav_bar.dart';
+import 'home_screen.dart';
+import 'comics_screen.dart';
+import 'movies_screen.dart';
+
 
 class SeriesScreen extends StatelessWidget {
   @override
@@ -56,6 +60,8 @@ class SeriesScreen extends StatelessWidget {
             }
           },
         ),
+        // Ajout de la NavBar ici
+
       ),
     );
   }

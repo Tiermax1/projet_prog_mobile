@@ -3,9 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/comics/comics_bloc.dart';
 import '../bloc/comics/comics_event.dart';
 import '../bloc/comics/comics_state.dart';
+import '../recherche.dart';
 import '../widgets/comics_card.dart';
 import '../widgets/nav_bar.dart';
 import '../config.dart'; // Assurez-vous que cette importation est correcte
+import 'home_screen.dart';
+import 'movies_screen.dart';
+import 'series_screen.dart';
 
 class ComicsScreen extends StatelessWidget {
   @override
@@ -57,6 +61,7 @@ class ComicsScreen extends StatelessWidget {
             }
           },
         ),
+
       ),
     );
   }

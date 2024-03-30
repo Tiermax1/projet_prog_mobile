@@ -11,7 +11,12 @@ class SectionCard extends StatelessWidget {
     // Ici, nous supposons que 'item' a des clés comme 'name' et 'image' pour simplifier.
     // Vous devrez peut-être ajuster ces clés en fonction de la structure de vos données.
     String imageUrl = item['image']?['medium_url'] ?? 'assets/images/default_image.png';
-    String name = item['name'] ?? 'Titre inconnu';
+    String name;
+    if (item.containsKey('volume')) { // Supposons que cela indique un comic
+      name = item['volume']['name'];
+    } else { // Pour films et séries
+      name = item['name'];
+    }
     // Assurez-vous d'avoir une icône 'placeholder.svg' dans vos assets si l'image est manquante.
     return Container(
       width: 150,

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:projet_prog_mobile/screens/comics_screen.dart';
+import 'package:projet_prog_mobile/screens/movies_screen.dart';
+import 'package:projet_prog_mobile/screens/series_screen.dart';
 import '../bloc/comics/comics_bloc.dart';
 import '../bloc/comics/comics_event.dart';
 import '../bloc/comics/comics_state.dart';
@@ -10,6 +13,7 @@ import '../bloc/movies/movies_state.dart';
 import '../bloc/series/series_bloc.dart';
 import '../bloc/series/series_event.dart';
 import '../bloc/series/series_state.dart';
+import '../recherche.dart';
 import '../widgets/build_section.dart';
 import '../widgets/nav_bar.dart';
 
@@ -61,17 +65,41 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-            buildSectionBloc<SeriesBloc, SeriesState>('Séries populaires'),
-            buildSectionBloc<ComicsBloc, ComicsState>('Comics populaires'),
-            buildSectionBloc<MoviesBloc, MoviesState>('Films populaires'),
+            buildSectionBloc<SeriesBloc, SeriesState>('Séries populaires',
+              onSeeMorePressed: () => navigateToSeriesList(context),
+            ),
+            buildSectionBloc<ComicsBloc, ComicsState>('Comics populaires',
+              onSeeMorePressed: () => navigateToComicsList(context),
+            ),
+            buildSectionBloc<MoviesBloc, MoviesState>('Films populaires',
+              onSeeMorePressed: () => navigateToMoviesList(context),
+            ),
 
           ],
         ),
+
       ),
     );
   }
+  void navigateToSeriesList(BuildContext context) {
+    // Naviguez vers l'écran de liste des séries
+    Navigator.push(context, MaterialPageRoute(builder: (_) => SeriesScreen()));
+  }
 
-  Widget buildSectionBloc<B extends BlocBase<S>, S>(String title) {
+  void navigateToComicsList(BuildContext context) {
+    // Naviguez vers l'écran de liste des comics
+    Navigator.push(context, MaterialPageRoute(builder: (_) => ComicsScreen()));
+  }
+
+  void navigateToMoviesList(BuildContext context) {
+    // Naviguez vers l'écran de liste des films
+    Navigator.push(context, MaterialPageRoute(builder: (_) => FilmsScreen()));
+  }
+}
+Widget buildSectionBloc<B extends BlocBase<S>, S>(
+    String title, {
+      required VoidCallback onSeeMorePressed, // Ajoutez ce paramètre
+    }) {
     return BlocBuilder<B, S>(
       builder: (context, state) {
         if (state is ComicsLoading || state is MoviesLoading || state is SeriesLoading) {
@@ -100,5 +128,6 @@ class HomeScreen extends StatelessWidget {
         }
       },
     );
+
   }
-}
+
