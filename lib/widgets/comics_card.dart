@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:projet_prog_mobile/models/comics.dart';
 
 class ComicsCard extends StatelessWidget {
-  final Map<String, dynamic> comics;
-  final int index;
+  final Comics comic;
+  final int index; // Ajoutez ce champ
 
-  ComicsCard({required this.comics, required this.index});
+  // Ajoutez {required this.index} au constructeur
+  const ComicsCard({Key? key, required this.comic, required this.index}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    String imageUrl = comics['image']?['medium_url'] ?? 'assets/images/default_image.png';
-    String name = comics['volume']?['name'] ?? 'Titre inconnu';
-    String description = comics['name'] ?? 'N/A';
-    String issueNumber = comics['issue_number']?.toString() ?? 'N/A';
-    String year = comics['cover_date']?.split('-')[0] ?? 'N/A';
+    String imageUrl = comic.imageUrl ?? 'assets/images/default_image.png';
+    String name = comic.volume['name'] ?? 'Titre inconnu';
+    String description = comic.name ?? 'N/A';
+    String issueNumber = comic.issueNumber?.toString() ?? 'N/A';
+    String year = comic.coverDate?.split('-')[0] ?? 'N/A';
 
     return Container(
       height: 150,
@@ -73,8 +75,6 @@ class ComicsCard extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      SvgPicture.asset('assets/images/ic_books_bicolor.svg', width: 14, height: 14, color: Colors.white70),
-                      SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           description,

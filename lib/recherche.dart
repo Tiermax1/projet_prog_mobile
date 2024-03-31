@@ -1,10 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:http/http.dart' as http;
-import '../widgets/nav_bar.dart';
-import 'config.dart';
-import 'main.dart';
+
 
 
 class SearchPage extends StatefulWidget {

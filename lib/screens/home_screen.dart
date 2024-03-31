@@ -14,6 +14,7 @@ import '../bloc/series/series_bloc.dart';
 import '../bloc/series/series_event.dart';
 import '../bloc/series/series_state.dart';
 import '../recherche.dart';
+import '../repository/comics_repository.dart';
 import '../widgets/build_section.dart';
 import '../widgets/nav_bar.dart';
 
@@ -23,7 +24,9 @@ class HomeScreen extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<ComicsBloc>(
-          create: (context) => ComicsBloc()..add(FetchComicsEvent()),
+          create: (context) => ComicsBloc(
+            comicsRepository: RepositoryProvider.of<ComicsRepository>(context),
+          )..add(FetchComicsEvent()),
         ),
         BlocProvider<MoviesBloc>(
           create: (context) => MoviesBloc()..add(FetchMoviesEvent()),
