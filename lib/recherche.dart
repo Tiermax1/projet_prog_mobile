@@ -1,16 +1,118 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'navBar.dart'; // Remplacez ceci par le chemin d'accès correct de votre NavBar personnalisée
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'config.dart';
 
 class SearchPage extends StatefulWidget {
   @override
   _SearchPageState createState() => _SearchPageState();
 }
 
+class SearchResult {
+  final String title;
+  final String imageUrl;
+  final String category;
+
+  SearchResult({required this.title, required this.imageUrl, required this.category});
+}
+
+Future<List<SearchResult>> searchMovies(String query) async {
+  final String apiUrl = 'https://comicvine.gamespot.com/api/movies?api_key=${Config.comicVineApiKey}&format=json&filter=name:$query';
+  try {
+    final response = await http.get(Uri.parse(apiUrl));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      // Transforme les résultats en une liste d'objets SearchResult
+      List<SearchResult> searchResults = (data['results'] as List).map((movie) {
+        return SearchResult(
+          title: movie['name'], // Assume que 'name' est le titre du film
+          imageUrl: movie['image']['medium_url'], // Utilise 'medium_url' pour l'image, ajuste si nécessaire
+          category: 'Films', // Définit la catégorie des résultats
+        );
+      }).toList();
+
+      return searchResults;
+    } else {
+      print('Échec du chargement des films: ${response.statusCode}');
+      return [];
+    }
+  } catch (e) {
+    print('Échec du chargement des films: $e');
+    return [];
+  }
+}
+
+
+Future<List<SearchResult>> searchSeries(String query) async {
+  final String apiKey = Config.comicVineApiKey;
+  final String apiUrl = 'https://comicvine.gamespot.com/api/search/?api_key=$apiKey&format=json&query=$query&resources=series';
+
+  try {
+    final response = await http.get(Uri.parse(apiUrl));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      // Transforme les résultats en une liste d'objets SearchResult
+      List<SearchResult> seriesResults = (data['results'] as List).map((series) {
+        // Fais des vérifications ici pour t'assurer que les données existent
+        String imageUrl = series['image'] != null ? series['image']['medium_url'] : '';
+        return SearchResult(
+          title: series['name'],
+          imageUrl: imageUrl, // Utilise une image par défaut si l'url n'est pas disponible
+          category: 'Séries',
+        );
+      }).toList();
+
+      return seriesResults;
+    } else {
+      print('Échec du chargement des séries: ${response.statusCode}');
+      return [];
+    }
+  } catch (e) {
+    print('Échec du chargement des séries: $e');
+    return [];
+  }
+}
+
+Future<List<SearchResult>> searchComics(String query) async {
+  final String apiUrl = 'https://comicvine.gamespot.com/api/issues?api_key=${Config.comicVineApiKey}&format=json&filter=name:$query';
+
+  try {
+    final response = await http.get(Uri.parse(apiUrl));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      List<SearchResult> comicResults = [];
+
+      for (var comic in data['results']) {
+        // Pour chaque comic trouvé, extrait les informations nécessaires
+        String title = comic['name'] ?? 'Titre inconnu';
+        String imageUrl = comic['image'] != null ? comic['image']['medium_url'] : 'https://via.placeholder.com/150';
+        // Création d'un objet SearchResult pour chaque comic
+        comicResults.add(SearchResult(
+          title: title,
+          imageUrl: imageUrl,
+          category: 'Comics',
+        ));
+      }
+
+      return comicResults;
+    } else {
+      print('Échec du chargement des comics: ${response.statusCode}');
+      return [];
+    }
+  } catch (e) {
+    print('Échec du chargement des comics: $e');
+    return [];
+  }
+}
+
+
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   bool isSearching = false;
-  List<String> searchResults = []; // Liste des résultats de recherche
+  List<SearchResult> searchResults = [];
+  // Liste des résultats de recherche
 
   @override
   void initState() {
@@ -24,19 +126,36 @@ class _SearchPageState extends State<SearchPage> {
     super.dispose();
   }
 
-  void onSearch() {
+  void onSearch() async {
     setState(() {
       isSearching = true;
+      searchResults.clear(); // Efface les résultats précédents
     });
-    // Simuler une recherche en attente
-    Future.delayed(Duration(seconds: 2), () {
-      // Simuler des résultats de recherche
+
+    // Lance toutes les recherches en parallèle et attend leur achèvement
+    try {
+      final results = await Future.wait([
+        searchMovies(_searchController.text),
+        searchSeries(_searchController.text),
+        searchComics(_searchController.text),
+      ]);
+
+      // Combine tous les résultats en une liste unique
+      final allResults = results.expand((x) => x).toList();
+
+      setState(() {
+        searchResults = allResults;
+      });
+    } catch (error) {
+      // Gérer l'erreur ici, par exemple en affichant un message
+      print("Erreur lors de la recherche: $error");
+    } finally {
       setState(() {
         isSearching = false;
-        searchResults = ["Titans", "Young Justice: Outsiders"]; // Résultats factices
       });
-    });
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -115,13 +234,92 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget buildResultsList() {
-    return ListView.builder(
-      itemCount: searchResults.length,
-      itemBuilder: (context, index) {
-        return ListTile(title: Text(searchResults[index]));
-      },
+    // Grouper les résultats de recherche par catégorie
+    Map<String, List<SearchResult>> groupedResults = {
+      'Films': [],
+      'Séries': [],
+      'Comics': [],
+    };
+
+    for (var result in searchResults) {
+      groupedResults[result.category]?.add(result);
+    }
+
+    return ListView(
+      children: groupedResults.entries.map((entry) {
+        return buildSection(
+          title: '${entry.key} populaires',
+          items: entry.value,
+        );
+      }).toList(),
     );
   }
+
+
+  Widget buildSection({
+    required String title,
+    required List<SearchResult> items,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            title,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+        ),
+        Container(
+          height: 200,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              SearchResult item = items[index];
+              return Container(
+                width: 120,
+                margin: EdgeInsets.only(left: 16, right: index == items.length - 1 ? 16 : 0),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          item.imageUrl,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      item.title,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+
+
+
 
   Widget buildSearchInput(BuildContext context, double scaleFactor) {
     return Column(
